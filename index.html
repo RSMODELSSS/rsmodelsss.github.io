@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R.S. Model School Notes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url(back.jpg);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            padding: 30px;
+            background: linear-gradient(to bottom right, rgba(247, 86, 16), #ec9176);
+            border-radius: 15px;
+            margin: 50px auto;
+            max-width: 900px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .class-container, .subject-container, .file-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+        }
+
+        .btn-primary {
+            background-color: #ff5722;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #ff7043;
+        }
+
+        .btn-secondary {
+            background-color: #4CAF50;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #66bb6a;
+        }
+
+        .school-info {
+            margin-top: 20px;
+            text-align: center;
+            color: #2e7d32;
+        }
+
+        a {
+            color: green;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .spinner-border {
+            display: none;
+        }
+
+        .loading .spinner-border {
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+        }
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+<img src="main.png" class="header-image">    <div class="container">
+
+        <div id="class-category-container" class="class-container text-center">
+            <h2>Select Class Category</h2>
+            <button class="btn btn-primary m-2" onclick="selectClassCategory('Pre-Primary')">Pre-Primary</button>
+            <button class="btn btn-primary m-2" onclick="selectClassCategory('Primary')">Primary</button>
+            <button class="btn btn-primary m-2" onclick="selectClassCategory('Middle')">Middle</button>
+            <button class="btn btn-primary m-2" onclick="selectClassCategory('Secondary')">Secondary</button>
+            <button class="btn btn-primary m-2" onclick="selectClassCategory('Senior-Secondary')">Senior Secondary</button>
+        </div>
+
+        <div id="class-container" class="class-container text-center hidden">
+            <h2>Select Class</h2>
+            <div id="class-buttons" class="d-flex flex-wrap justify-content-center"></div>
+        </div>
+
+        <div id="subject-container" class="subject-container text-center hidden">
+            <h2>Select Subject</h2>
+            <div id="subject-buttons" class="d-flex flex-wrap justify-content-center"></div>
+        </div>
+
+        <div id="file-list" class="file-container hidden">
+            <h2 id="file-list-header">Select File</h2>
+            <div id="file-list-content"></div>
+        </div>
+        <div class="text-center">
+            <div class="spinner-border text-warning" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const subjects = {
+            "Nursery": ["English", "Hindi", "Punjabi"],
+            "LKG": ["English", "Hindi", "Punjabi"],
+            "UKG": ["English", "Hindi", "Punjabi"],
+            "1st-class": ["English", "Hindi", "Punj abi", "Mathematics", "EVS", "Computer"],
+            "2nd-class": ["English", "Hindi ", "Punjabi", "Mathematics", "EVS", "Computer"],
+            "3rd-class": ["English", "Hindi", "Punjabi", "Mathematics", "EVS", "Computer"],
+            "4th-class": ["English", "Hindi", "Punjabi", "Mathematics", "EVS", "Computer"],
+            "5th-class": ["English", "Hindi", "Punjabi", "Mathematics", "EVS", "Computer"],
+            "6th-class": ["English", "Hindi", "Punjabi", "Mathematics", "Science", "Social-Science", "Computer"],
+            "7th-class": ["English", "Hindi", "Punjabi", "Mathematics", "Science", "Social-Science", "Computer"],
+            "8th-class": ["English", "Hindi", "Punjabi", "Mathematics", "Science", "Social-Science", "Computer"],
+            "9th-class": ["English", "Hindi", "Punjabi", "Mathematics", "Science", "Social-Science", "Computer", "Physical-Education"],
+            "10th-class": ["English", "Hindi", "Punjabi", "Mathematics", "Science", "Social-Science", "Computer", "Physical-Education"],
+            "11th-class": ["English", "Hindi", "Punjabi", "Mathematics", "Physics", "Chemistry", "Biology", "Computer", "Political-Science"],
+            "12th-class": ["English", "Hindi", "Punjabi", "Mathematics", "Physics", "Chemistry", "Biology", "Computer", "Political-Science"]
+        };
+
+        const classCategories = {
+            'Pre-Primary': ['Nursery', 'LKG', 'UKG'],
+            'Primary': ['1st-class', '2nd-class', '3rd-class', '4th-class', '5th-class'],
+            'Middle': ['6th-class', '7th-class', '8th-class'],
+            'Secondary': ['9th-class', '10th-class'],
+            'Senior-Secondary': ['11th-class', '12th-class']
+        };
+
+        function selectClassCategory(category) {
+            document.getElementById("class-category-container").classList.add("hidden");
+            document.getElementById("class-container").classList.remove("hidden");
+
+            const classButtons = document.getElementById("class-buttons");
+            classButtons.innerHTML = '';  // Clear previous buttons
+
+            classCategories[category].forEach(className => {
+                const button = document.createElement("button");
+                button.className = "btn btn-primary m-2";
+                button.textContent = className.replace(/-/g, ' ');  // Replace hyphens with spaces
+                button.onclick = () => selectClass(className);
+                classButtons.appendChild(button);
+            });
+        }
+
+        function selectClass(className) {
+            document.getElementById("class-container").classList.add("hidden");
+            document.getElementById("subject-container").classList.remove("hidden");
+
+            const subjectButtons = document.getElementById("subject-buttons");
+            subjectButtons.innerHTML = '';  // Clear previous buttons
+
+            subjects[className].forEach(subject => {
+                const button = document.createElement("button");
+                button.className = "btn btn-secondary m-2";
+                button.textContent = subject;
+                button.onclick = () => loadFiles(className, subject);
+                subjectButtons.appendChild(button);
+            });
+        }
+
+        function loadFiles(className, subject) {
+            const fileListDiv = document.getElementById("file-list");
+            const spinner = document.querySelector('.spinner-border');
+
+            fileListDiv.innerHTML = '';
+            spinner.parentElement.classList.add('loading');
+
+            fetchFiles(className, subject)
+                .then(files => {
+                    spinner.parentElement.classList.remove('loading');
+                    fileListDiv.classList.remove("hidden");
+
+                    if (files.length > 0) {
+                        const list = document.createElement("ul");
+                        list.className = "list-group";
+                        files.forEach(file => {
+                            const listItem = document.createElement("li");
+                            listItem.className = "list-group-item bg-white text-dark";
+                            const link = document.createElement("a");
+                            link.href = file.download_url;
+                            link.target = "_blank";
+                            link.className = "stretched-link d-flex align-items-center";
+
+                            // Add PDF icon
+                            const pdfIcon = document.createElement("i");
+                            pdfIcon.className = "fas fa-file-pdf mr-2";
+                            link.appendChild(pdfIcon);
+
+                            // Add file name
+                            const fileNameSpan = document.createElement("span");
+                            fileNameSpan.textContent = file.name;
+                            link.appendChild(fileNameSpan);
+
+                            listItem.appendChild(link);
+                            list.appendChild(listItem);
+                        });
+                        fileListDiv.appendChild(list);
+                    } else {
+                        fileListDiv.innerHTML = '<div class="alert alert-warning">No files found.</div>';
+                    }
+                })
+                .catch(error => {
+                    spinner.parentElement.classList.remove('loading');
+                    fileListDiv.innerHTML = '<div class="alert alert-danger">Error loading files.</div>';
+                });
+        }
+
+        async function fetchFiles(className, subject) {
+            const url = `https://api.github.com/repos/DEEPAKMATHUR0/Notes/contents/${className}/${subject}`;
+            const response = await fetch(url);
+            const files = await response.json();
+            const pdfFiles = files.filter(file => file.name.endsWith('.pdf'));
+            return pdfFiles;
+        }
+    </script>
+</body>
+</html>
