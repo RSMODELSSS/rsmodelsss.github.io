@@ -233,7 +233,7 @@
         }
 
         async function fetchFiles(className, subject) {
-            const url = `https://api.github.com/repos/DEEPAKMATHUR0/Notes/contents/${className}/${subject}`;
+            const url = `https://api.github.com/repos/rsmodelsss/notes/contents/${className}/${subject}`;
             const response = await fetch(url);
             const files = await response.json();
             const pdfFiles = files.filter(file => file.name.endsWith('.pdf'));
